@@ -20,20 +20,30 @@ client.once(Events.ClientReady, (readyClient) => {
   console.log(`Bot online as ${readyClient.user.tag}`);
 });
 
-// Runs when someone joins
 client.on(Events.GuildMemberAdd, async (member) => {
-  const channel = member.guild.channels.cache.get(
-    process.env.WELCOME_CHANNEL_ID
-  );
+  const channelIds = [
+    process.env.WELCOME_CHANNEL_ID,
+    process.env.WELCOME_CHANNEL_2_ID,
+  ];
 
-  if (!channel) {
-    console.log("❌ Welcome channel not found");
-    return;
+  for (const channelId of channelIds) {
+    if (!channelId) continue;
+
+    const channel = member.guild.channels.cache.get(channelId);
+
+    if (!channel) {
+      console.log(`❌ Channel not found: ${channelId}`);
+      continue;
+    }
+
+    try {
+      await channel.send(
+        `👋 Welcome ${member} to **${member.guild.name}**! We're glad to have you here.`
+      );
+    } catch (error) {
+      console.error(`❌ Failed to send welcome message:`, error);
+    }
   }
-
-  await channel.send(
-    `👋 Welcome ${member} to **${member.guild.name}**! We're glad to have you here.`
-  );
 });
 
 client.login(process.env.DISCORD_TOKEN);
