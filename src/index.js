@@ -1,6 +1,11 @@
 
 
-const { Client, GatewayIntentBits } = require("discord.js");
+const {
+  Client,
+  GatewayIntentBits,
+  Events,
+} = require("discord.js");
+
 require("dotenv").config();
 
 const client = new Client({
@@ -10,29 +15,14 @@ const client = new Client({
   ],
 });
 
-client.once("ready", () => {
-  console.log(`Bot online as ${client.user.tag}`);
+// Runs when the bot connects
+client.once(Events.ClientReady, (readyClient) => {
+  console.log(`Bot online as ${readyClient.user.tag}`);
 });
 
-client.on("guildMemberAdd", async (member) => {
+// Runs when someone joins
+client.on(Events.GuildMemberAdd, async (member) => {
   const channel = member.guild.channels.cache.get(
-    process.env.WELCOME_CHANNEL_ID
-  );
-
-  if (!channel) {
-    console.log("Welcome channel not found.");
-    return;
-  }
-
-  await channel.send(
-    `👋 Welcome ${member} to **${member.guild.name}**! We're glad to have you here.`
-  );
-});
-
-client.once("ready", async () => {
-  console.log(`Bot online as ${client.user.tag}`);
-
-  const channel = client.channels.cache.get(
     process.env.WELCOME_CHANNEL_ID
   );
 
@@ -41,8 +31,9 @@ client.once("ready", async () => {
     return;
   }
 
-  await channel.send("👋 Test successful! Welcome bot is working.");
-  console.log("✅ Test welcome message sent");
+  await channel.send(
+    `👋 Welcome ${member} to **${member.guild.name}**! We're glad to have you here.`
+  );
 });
 
 client.login(process.env.DISCORD_TOKEN);
